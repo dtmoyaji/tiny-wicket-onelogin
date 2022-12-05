@@ -1,8 +1,8 @@
 package com.tmworks;
 
 import com.tmworks.sso.AuthenticatedSession;
-import com.tmworks.sso.SamlSigninPage;
 import com.tmworks.sso.SamlLogoutPage;
+import com.tmworks.sso.SamlSigninPage;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.csp.CSPDirective;
@@ -35,7 +35,6 @@ public class WicketApplication extends AuthenticatedWebApplication {
                 .add(CSPDirective.FONT_SRC, "https://fonts.gstatic.com");
 
         // add your configuration here
-        this.mountPage("MainPage", MainPage.class);
         this.mountPage("SamlLogin", SamlSigninPage.class);
         this.mountPage("SamlLogout", SamlLogoutPage.class);
     }
