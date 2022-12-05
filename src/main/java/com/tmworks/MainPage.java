@@ -15,15 +15,7 @@
  */
 package com.tmworks;
 
-import com.onelogin.saml2.Auth;
-import com.tmworks.sso.SamlLoginPage;
-import com.tmworks.sso.SamlProcess;
 import com.tmworks.sso.SamlSignControlPanel;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -34,6 +26,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  *
  * @author bythe
  */
+//@AuthorizeInstantiation("user")
 public class MainPage extends WebPage {
 
     private Button button;
@@ -45,47 +38,13 @@ public class MainPage extends WebPage {
     public MainPage(final PageParameters parameters) {
         super(parameters);
 
-        SamlProcess checkLogin = new SamlProcess(
-                (HttpServletRequest) this.getRequest().getContainerRequest(),
-                (HttpServletResponse) this.getResponse().getContainerResponse(),
-                SamlProcess.MODE_CHECKLOGIN
-        );
-
-        Auth auth = checkLogin.getAuth();
-
         PageParameters responseParameter = new PageParameters();
-        if (auth != null) {
-            responseParameter.add("id", (auth.getLastAssertionId()) == null ? "" : auth.getLastAssertionId());
-            responseParameter.add("name_id", (auth.getNameId() == null) ? "" : auth.getNameId());
-            responseParameter.add("session_index", (auth.getSessionIndex() == null) ? "" : auth.getSessionIndex());
-            responseParameter.add("nameid_format", (auth.getSessionIndex() == null) ? "" : auth.getNameIdFormat());
-        }
-
         this.signControlPanel = new SamlSignControlPanel(
                 "signControlPanel",
                 responseParameter
         );
-
         this.add(this.signControlPanel);
         this.log = (Label) new Label("log", Model.of("")).setEscapeModelStrings(false);
         this.add(log);
-
-        if (checkLogin.getStatus() == SamlProcess.STATUS_AUTHENTICATED) {
-            try {
-                auth.processResponse();
-            } catch (Exception ex) {
-                Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        if (auth.isAuthenticated()) {
-            String data = "";
-            List<String> names = auth.getAttributesName();
-            data = names.stream().map((name) -> name + " : " + auth.getAttribute(name) + "<br>").reduce(data, String::concat);
-            this.log.setDefaultModelObject(data);
-        } else {
-            this.setResponsePage(SamlLoginPage.class);
-        }
     }
-
 }

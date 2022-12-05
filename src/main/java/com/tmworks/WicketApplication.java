@@ -1,6 +1,7 @@
 package com.tmworks;
 
-import com.tmworks.sso.SamlLoginPage;
+import com.tmworks.sso.AuthenticatedSession;
+import com.tmworks.sso.SamlSigninPage;
 import com.tmworks.sso.SamlLogoutPage;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
@@ -35,7 +36,7 @@ public class WicketApplication extends AuthenticatedWebApplication {
 
         // add your configuration here
         this.mountPage("MainPage", MainPage.class);
-        this.mountPage("SamlLogin", SamlLoginPage.class);
+        this.mountPage("SamlLogin", SamlSigninPage.class);
         this.mountPage("SamlLogout", SamlLogoutPage.class);
     }
 
@@ -55,6 +56,6 @@ public class WicketApplication extends AuthenticatedWebApplication {
 
     @Override
     protected Class<? extends WebPage> getSignInPageClass() {
-        return SamlLoginPage.class;
+        return SamlSigninPage.class;
     }
 }

@@ -15,9 +15,6 @@
  */
 package com.tmworks.sso;
 
-import com.onelogin.saml2.Auth;
-import com.tmworks.ExtendedRoles;
-import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -26,25 +23,27 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  *
  * @author bythe
  */
-public class SamlLoginPage extends WebPage {
+public class SamlSigninPage extends WebPage {
 
     Roles myRole;
 
-    public SamlLoginPage(final PageParameters params) {
+    public SamlSigninPage(final PageParameters params) {
         super(params);
 
         // SAML処理
         SamlProcess checkLogin = new SamlProcess(
                 this,
-                SamlProcess.MODE_LOGIN
+                params,
+                SamlProcess.MODE_CHECKLOGIN
         );
-        myRole = ((AuthenticatedWebSession) this.getSession()).getRoles();
-        if (this.myRole.size() > 0) {
-            Auth auth = checkLogin.getAuth();
-            if (auth.isAuthenticated()) {
-                myRole.remove(ExtendedRoles.GUEST);
-                myRole.add(ExtendedRoles.USER);
-            }
+
+        if (checkLogin.getStatus() == SamlProcess.STATUS_NOTAUTHENTICATED) {
+            checkLogin = new SamlProcess(this, params, SamlProcess.MODE_LOGIN);
+        }
+
+        if (checkLogin.getStatus() == SamlProcess.STATUS_AUTHENTICATED) {
+            AuthenticatedSession session = (AuthenticatedSession) this.getSession();
+            session.putRoles("user");
         }
     }
 }

@@ -27,9 +27,12 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  */
 public class SamlSignControlPanel extends Panel {
 
-    private Form f;
+    private Form formLogout;
+
+    private Form formLogin;
 
     private Button logoutButton;
+    private Button loginButton;
 
     private PageParameters parameters;
 
@@ -38,21 +41,27 @@ public class SamlSignControlPanel extends Panel {
 
         this.parameters = parameters;
 
-        this.f = new Form("logoutForm");
-        this.add(this.f);
+        this.formLogout = new Form("logoutForm");
+        this.add(this.formLogout);
 
         this.logoutButton = new Button("logoutButton", Model.of("ログアウト")) {
-
             @Override
             public void onSubmit() {
-                logoutProcess();
+                this.setResponsePage(SamlLogoutPage.class, parameters);
             }
         };
-        this.f.add(this.logoutButton);
-    }
+        this.formLogout.add(this.logoutButton);
 
-    public void logoutProcess() {
-        this.setResponsePage(SamlLogoutPage.class, this.parameters);
+        this.formLogin = new Form("loginForm");
+        this.add(this.formLogin);
+
+        this.loginButton = new Button("loginButton", Model.of("ログイン")) {
+            @Override
+            public void onSubmit() {
+                this.setResponsePage(SamlSigninPage.class, parameters);
+            }
+        };
+        this.formLogin.add(this.loginButton);
     }
 
 }

@@ -21,11 +21,11 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tmworks</groupId>
-    <artifactId>wicket-sso</artifactId>
+    <artifactId>wicket-onelogin</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <!-- TODO project name  -->
-    <name>wicket-sso</name>
+    <name>wicket-onelogin</name>
     <description></description>
     <!--
             <organization>

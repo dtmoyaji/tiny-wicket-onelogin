@@ -97,7 +97,6 @@ public class SamlProcess {
         }
     }
 
-
     private void doLogout(HttpServletRequest request, HttpServletResponse response) {
         try {
             LogoutRequestParams lparams = new LogoutRequestParams(
@@ -136,6 +135,7 @@ public class SamlProcess {
         try {
             if (request.getParameter("SAMLResponse") == null) {
                 auth.login();
+                this.loginStatus = SamlProcess.STATUS_AUTHENTICATED;
             } else {
                 auth.processResponse();
                 if (!auth.isAuthenticated()) {

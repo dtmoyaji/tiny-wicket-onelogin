@@ -15,8 +15,6 @@
  */
 package com.tmworks.sso;
 
-import com.onelogin.saml2.Auth;
-import javax.servlet.http.Cookie;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -41,10 +39,10 @@ public class SamlLogoutPage extends WebPage {
         System.out.println(responseXml.toString());
 
         SamlProcess sprocess = new SamlProcess(this, params, SamlProcess.MODE_LOGOUT);
-        Auth auth = sprocess.getAuth();
+        //Auth auth = sprocess.getAuth();
 
         WebRequest webRequest = (WebRequest) RequestCycle.get().getRequest();
-        Cookie cookie = webRequest.getCookie("yourCookieName");
+        //Cookie cookie = webRequest.getCookie("yourCookieName");
 
         this.getSession().invalidateNow();
         this.getSession().clear();
