@@ -15,6 +15,8 @@
  */
 package com.tmworks.sso;
 
+import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -33,8 +35,12 @@ public class SamlSignControlPanel extends Panel {
 
     private final Button logoutButton;
     private final Button loginButton;
+    
+    private final Label lblInfo;
 
     private final PageParameters parameters;
+    
+    private SamlAuthInfo authInfo;
 
     public SamlSignControlPanel(String id, PageParameters parameters) {
         super(id);
@@ -62,6 +68,27 @@ public class SamlSignControlPanel extends Panel {
             }
         };
         this.formLogin.add(this.loginButton);
+        
+        this.lblInfo = new Label("info", Model.of("まだログインしていません"));
+        this.add(this.lblInfo);
+
+    }
+
+    public void showStatus(WebPage parent) {
+        SamlProcess sprocess = new SamlProcess(parent, SamlProcess.MODE_CHECKLOGIN);
+        if (sprocess.getStatus() == SamlProcess.STATUS_AUTHENTICATED) {
+            this.authInfo = new SamlAuthInfo(sprocess.getAuth());
+            String data = authInfo.getAttributes().toString();
+            this.lblInfo.setDefaultModel(Model.of(data));
+            this.loginButton.setVisible(false);
+        } else {
+            this.authInfo = null;
+            this.logoutButton.setVisible(false);
+        }
+    }
+    
+    public SamlAuthInfo getAuth(){
+        return this.authInfo;
     }
 
 }

@@ -16,6 +16,7 @@
 package com.tmworks;
 
 import com.tmworks.sso.SamlSignControlPanel;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -26,7 +27,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  *
  * @author bythe
  */
-//@AuthorizeInstantiation("user")
+@AuthorizeInstantiation("user")
 public class MainPage extends WebPage {
 
     private Button button;
@@ -38,12 +39,14 @@ public class MainPage extends WebPage {
     public MainPage(final PageParameters parameters) {
         super(parameters);
 
-        PageParameters responseParameter = new PageParameters();
         this.signControlPanel = new SamlSignControlPanel(
                 "signControlPanel",
-                responseParameter
+                parameters
         );
+        this.signControlPanel.showStatus(this);
         this.add(this.signControlPanel);
+
+
         this.log = (Label) new Label("log", Model.of("")).setEscapeModelStrings(false);
         this.add(log);
     }

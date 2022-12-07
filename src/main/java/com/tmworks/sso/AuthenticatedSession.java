@@ -15,7 +15,7 @@
  */
 package com.tmworks.sso;
 
-import com.tmworks.sso.SamlProcess;
+import com.onelogin.saml2.Auth;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
@@ -30,6 +30,8 @@ public class AuthenticatedSession extends AuthenticatedWebSession {
     private final Request request;
 
     Roles myRoles;
+    
+    Auth auth;
 
     public AuthenticatedSession(Request request) {
         super(request);
@@ -68,6 +70,14 @@ public class AuthenticatedSession extends AuthenticatedWebSession {
         if (!this.myRoles.contains(role)) {
             this.myRoles.add(role);
         }
+    }
+    
+    public void setAuth(Auth auth){
+        this.auth = auth;
+    }
+    
+    public Auth getAuth(){
+        return auth;
     }
 
 }

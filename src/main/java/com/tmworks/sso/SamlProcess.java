@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.IRequestParameters;
 import org.w3c.dom.Document;
 
 /**
@@ -50,7 +50,7 @@ public class SamlProcess {
 
     private int loginStatus = STATUS_NOTAUTHENTICATED;
 
-    private PageParameters params;
+    private IRequestParameters params;
 
     private WebPage page;
 
@@ -63,17 +63,15 @@ public class SamlProcess {
     }
 
     public SamlProcess(WebPage page, int mode) {
-        this.page = page;
-        HttpServletRequest request = (HttpServletRequest) page.getRequest().getContainerRequest();
-        HttpServletResponse response = (HttpServletResponse) page.getResponse().getContainerResponse();
-        resolve(request, response, mode);
+        this.resolve(page, mode);
     }
 
-    public SamlProcess(WebPage page, PageParameters parameters, int mode) {
+    private void resolve(WebPage page, int mode) {
         this.page = page;
-        this.params = parameters;
         HttpServletRequest request = (HttpServletRequest) page.getRequest().getContainerRequest();
+        this.params = this.page.getRequest().getRequestParameters();
         HttpServletResponse response = (HttpServletResponse) page.getResponse().getContainerResponse();
+        this.session = this.page.getSession();
         resolve(request, response, mode);
     }
 
@@ -114,41 +112,33 @@ public class SamlProcess {
 
     private void checkLogin(HttpServletRequest request, HttpServletResponse response) {
         this.loginStatus = SamlProcess.STATUS_NOTAUTHENTICATED;
-
-        String param = request.getParameter("SAMLResponse");
+        String param = this.params.getParameterValue("SAMLResponse").toString();
         if (param != null) {
             try {
                 String samlResponseString = new String(Util.base64decoder(param), "UTF-8");
                 Document samlResponseDocument = Util.loadXML(samlResponseString);
                 if (samlResponseDocument != null) {
+                    this.auth.processResponse();
                     this.loginStatus = SamlProcess.STATUS_AUTHENTICATED;
                 }
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
     }
 
     private void doLogin(HttpServletRequest request, HttpServletResponse response) {
         this.loginStatus = SamlProcess.STATUS_NOTAUTHENTICATED;
+
         try {
-            if (request.getParameter("SAMLResponse") == null) {
+            this.checkLogin(request, response);
+            if (this.loginStatus == SamlProcess.STATUS_NOTAUTHENTICATED) {
                 auth.login();
                 this.loginStatus = SamlProcess.STATUS_AUTHENTICATED;
-            } else {
-                auth.processResponse();
-                if (!auth.isAuthenticated()) {
-                    auth.getErrors().forEach((reason) -> {
-                        System.out.println(reason);
-                    });
-                } else {
-                    this.loginStatus = SamlProcess.STATUS_AUTHENTICATED;
-                }
-            }
-        } catch (IOException | SettingsException | com.onelogin.saml2.exception.Error ex) {
-            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception ex) {
+            } 
+        } catch (IOException | SettingsException  ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

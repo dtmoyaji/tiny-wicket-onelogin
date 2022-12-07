@@ -38,7 +38,7 @@ public class SamlLogoutPage extends WebPage {
         responseXml = params.get("id");
         System.out.println(responseXml.toString());
 
-        SamlProcess sprocess = new SamlProcess(this, params, SamlProcess.MODE_LOGOUT);
+        SamlProcess sprocess = new SamlProcess(this, SamlProcess.MODE_LOGOUT);
         //Auth auth = sprocess.getAuth();
 
         WebRequest webRequest = (WebRequest) RequestCycle.get().getRequest();
@@ -46,5 +46,6 @@ public class SamlLogoutPage extends WebPage {
 
         this.getSession().invalidateNow();
         this.getSession().clear();
+        
     }
 }
