@@ -7,4 +7,4 @@ rename config.saml.sample.properties to config.saml.properties and edit each par
 this is checkd by using keycloak.
 
 # note
-if you want to supply rolelist stored in keycloak, you need add rolelist attribute in keycloak's client mapper, and set single rolelist attribute into enable.
+if you want to supply rolelist stored in keycloak, you need to add rolelist attribute in keycloak's client mapper, and set single rolelist attribute into enable.
