@@ -98,7 +98,7 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
     }
 
     public String getSessionIndex() {
-        if(this.sessionIndex==null){
+        if (this.sessionIndex == null) {
             this.sessionIndex = "";
         }
         return this.sessionIndex;
@@ -109,7 +109,7 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
     }
 
     public String getNameId() {
-        if(this.nameId==null){
+        if (this.nameId == null) {
             this.nameId = "";
         }
         return this.nameId;
@@ -130,21 +130,23 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
 
     public String packAttributes() {
         String paramv = "";
-        Set<String> keys = this.attributes.keySet();
-        for (String key : keys) {
-            List<String> value = this.attributes.get(key);
-            if (!value.isEmpty()) {
-                if (key.toLowerCase().equals(SamlAuthInfo.COOKIE_KEY_ROLE)) {
-                    String rolelist = "";
-                    for (String item : value) {
-                        rolelist += COOKIE_ITEM_INNER_SEPARATOR + item;
+        if (this.attributes != null) {
+            Set<String> keys = this.attributes.keySet();
+            for (String key : keys) {
+                List<String> value = this.attributes.get(key);
+                if (!value.isEmpty()) {
+                    if (key.toLowerCase().equals(SamlAuthInfo.COOKIE_KEY_ROLE)) {
+                        String rolelist = "";
+                        for (String item : value) {
+                            rolelist += COOKIE_ITEM_INNER_SEPARATOR + item;
+                        }
+                        if (!rolelist.isEmpty()) {
+                            rolelist = rolelist.substring(1);
+                        }
+                        paramv += key + COOKIE_ITEM_EQUALS + rolelist + COOKIE_ITEM_END;
+                    } else {
+                        paramv += key + COOKIE_ITEM_EQUALS + value.get(0) + COOKIE_ITEM_END;
                     }
-                    if (!rolelist.isEmpty()) {
-                        rolelist = rolelist.substring(1);
-                    }
-                    paramv += key + COOKIE_ITEM_EQUALS + rolelist + COOKIE_ITEM_END;
-                } else {
-                    paramv += key + COOKIE_ITEM_EQUALS + value.get(0) + COOKIE_ITEM_END;
                 }
             }
         }
