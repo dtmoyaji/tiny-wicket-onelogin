@@ -17,10 +17,9 @@ package com.tmworks.sso;
 
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.string.StringValue;
 
 /**
  *
@@ -33,19 +32,25 @@ public class SamlLogoutPage extends WebPage {
     public SamlLogoutPage(final PageParameters params) {
         super(params);
 
-        StringValue responseXml = params.get("name_id");
-        System.out.println(responseXml.toString());
-        responseXml = params.get("id");
-        System.out.println(responseXml.toString());
+        SamlProcess process = new SamlProcess(this, SamlProcess.MODE_CHECKLOGIN);
+        if (process.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
+            AuthenticatedSession authSession = (AuthenticatedSession) this.getSession();
 
-        SamlProcess sprocess = new SamlProcess(this, SamlProcess.MODE_LOGOUT);
-        //Auth auth = sprocess.getAuth();
+            String responseXml = authSession.getSamlAuthInfo().getNameId();
+            System.out.println(responseXml);
+            responseXml = authSession.getSamlAuthInfo().getSessionIndex();
+            System.out.println(responseXml);
 
-        WebRequest webRequest = (WebRequest) RequestCycle.get().getRequest();
-        //Cookie cookie = webRequest.getCookie("yourCookieName");
+            SamlProcess sprocess = new SamlProcess(this, SamlProcess.MODE_LOGOUT);
+            //Auth auth = sprocess.getAuth();
 
-        this.getSession().invalidateNow();
-        this.getSession().clear();
-        
+            WebRequest webRequest = (WebRequest) this.getRequestCycle().getRequest();
+            SamlAuthInfo.clearCookie(webRequest, (WebResponse) this.getRequestCycle().getResponse(), "samlprocess");
+
+            this.getSession().invalidateNow();
+            this.getSession().clear();
+
+        }
+
     }
 }

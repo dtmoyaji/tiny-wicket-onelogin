@@ -15,7 +15,6 @@
  */
 package com.tmworks.sso;
 
-import com.onelogin.saml2.Auth;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -37,15 +36,9 @@ public class SamlSigninPage extends WebPage {
                 SamlProcess.MODE_CHECKLOGIN
         );
 
-        if (checkLogin.getStatus() == SamlProcess.STATUS_NOTAUTHENTICATED) {
+        if (checkLogin.getStatus() == SamlAuthInfo.STATUS_NOTAUTHENTICATED) {
             checkLogin = new SamlProcess(this, SamlProcess.MODE_LOGIN);
         }
 
-        if (checkLogin.getStatus() == SamlProcess.STATUS_AUTHENTICATED) {
-            AuthenticatedSession session = (AuthenticatedSession) this.getSession();
-            session.putRoles("user");
-            Auth auth = checkLogin.getAuth();
-            session.setAuth(auth);
-        }
     }
 }

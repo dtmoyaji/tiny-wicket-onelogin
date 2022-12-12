@@ -16,6 +16,7 @@
 package com.tmworks;
 
 import com.tmworks.sso.SamlSignControlPanel;
+import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -37,6 +38,8 @@ public class MainPage extends WebPage {
 
     public MainPage(final PageParameters parameters) {
         super(parameters);
+        
+        Session session = this.getSession();
 
         this.signControlPanel = new SamlSignControlPanel(
                 "signControlPanel",
@@ -45,8 +48,8 @@ public class MainPage extends WebPage {
         this.signControlPanel.showStatus(this);
         this.add(this.signControlPanel);
 
-
         this.log = (Label) new Label("log", Model.of("")).setEscapeModelStrings(false);
         this.add(log);
+        
     }
 }

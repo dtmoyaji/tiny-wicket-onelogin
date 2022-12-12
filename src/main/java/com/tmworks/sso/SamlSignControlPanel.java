@@ -15,12 +15,15 @@
  */
 package com.tmworks.sso;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
@@ -35,11 +38,11 @@ public class SamlSignControlPanel extends Panel {
 
     private final Button logoutButton;
     private final Button loginButton;
-    
+
     private final Label lblInfo;
 
     private final PageParameters parameters;
-    
+
     private SamlAuthInfo authInfo;
 
     public SamlSignControlPanel(String id, PageParameters parameters) {
@@ -68,17 +71,26 @@ public class SamlSignControlPanel extends Panel {
             }
         };
         this.formLogin.add(this.loginButton);
-        
+
         this.lblInfo = new Label("info", Model.of("まだログインしていません"));
         this.add(this.lblInfo);
 
     }
 
     public void showStatus(WebPage parent) {
+        AuthenticatedSession session = (AuthenticatedSession) this.getSession();
+
         SamlProcess sprocess = new SamlProcess(parent, SamlProcess.MODE_CHECKLOGIN);
-        if (sprocess.getStatus() == SamlProcess.STATUS_AUTHENTICATED) {
+        if (sprocess.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
             this.authInfo = new SamlAuthInfo(sprocess.getAuth());
+            this.authInfo.saveCookie((WebResponse) parent.getRequestCycle().getResponse(), "samlprocess", 3600);
+
+            session.setSamlAuthInfo(this.authInfo);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SamlAuthInfo Generaterd.");
+
             String data = authInfo.getAttributes().toString();
+            data += "<br />[session-index]:" + this.authInfo.getSessionIndex();
+            data += "<br />[nameid]:" + this.authInfo.getNameId();
             this.lblInfo.setDefaultModel(Model.of(data));
             this.loginButton.setVisible(false);
         } else {
@@ -86,8 +98,8 @@ public class SamlSignControlPanel extends Panel {
             this.logoutButton.setVisible(false);
         }
     }
-    
-    public SamlAuthInfo getAuth(){
+
+    public SamlAuthInfo getAuth() {
         return this.authInfo;
     }
 

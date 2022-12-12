@@ -15,7 +15,6 @@
  */
 package com.tmworks.sso;
 
-import com.onelogin.saml2.Auth;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
@@ -28,34 +27,30 @@ import org.apache.wicket.request.Request;
 public class AuthenticatedSession extends AuthenticatedWebSession {
 
     private final Request request;
-
-    Roles myRoles;
     
-    Auth auth;
+    private SamlAuthInfo SamlAuthInfo;
 
     public AuthenticatedSession(Request request) {
         super(request);
         this.request = request;
-        this.myRoles = new Roles();
     }
 
     @Override
     protected boolean authenticate(String userName, String password) {
 
-        HttpServletRequest request = (HttpServletRequest) this.request.getContainerRequest();
+        HttpServletRequest servletRequest = (HttpServletRequest) this.request.getContainerRequest();
 
         SamlProcess checkLogin = new SamlProcess(
-                request,
+                servletRequest,
                 null,
                 SamlProcess.MODE_CHECKLOGIN
         );
 
-        if (checkLogin.getStatus() == SamlProcess.STATUS_NOTAUTHENTICATED) {
-            checkLogin = new SamlProcess(request, null, SamlProcess.MODE_LOGIN);
+        if (checkLogin.getStatus() == SamlAuthInfo.STATUS_NOTAUTHENTICATED) {
+            checkLogin = new SamlProcess(servletRequest, null, SamlProcess.MODE_LOGIN);
         }
 
-        if (checkLogin.getStatus() == SamlProcess.STATUS_AUTHENTICATED) {
-            this.myRoles.add("user");
+        if (checkLogin.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
             return true;
         }
         return false;
@@ -63,21 +58,16 @@ public class AuthenticatedSession extends AuthenticatedWebSession {
 
     @Override
     public Roles getRoles() {
-        return this.myRoles;
+        return new Roles();
     }
 
-    public void putRoles(String role) {
-        if (!this.myRoles.contains(role)) {
-            this.myRoles.add(role);
-        }
+    public void setSamlAuthInfo(SamlAuthInfo info) {
+        this.SamlAuthInfo = info;
+        System.out.println(this.SamlAuthInfo.toString());
     }
-    
-    public void setAuth(Auth auth){
-        this.auth = auth;
-    }
-    
-    public Auth getAuth(){
-        return auth;
+
+    public SamlAuthInfo getSamlAuthInfo() {
+        return this.SamlAuthInfo;
     }
 
 }

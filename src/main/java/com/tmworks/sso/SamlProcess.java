@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.IRequestParameters;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.http.WebResponse;
 import org.w3c.dom.Document;
 
 /**
@@ -44,11 +46,7 @@ public class SamlProcess {
 
     public static final int MODE_LOGOUT = 2;
 
-    public static final int STATUS_NOTAUTHENTICATED = 0;
-
-    public static final int STATUS_AUTHENTICATED = 1;
-
-    private int loginStatus = STATUS_NOTAUTHENTICATED;
+    private int loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
     private IRequestParameters params;
 
@@ -69,8 +67,8 @@ public class SamlProcess {
     private void resolve(WebPage page, int mode) {
         this.page = page;
         HttpServletRequest request = (HttpServletRequest) page.getRequest().getContainerRequest();
-        this.params = this.page.getRequest().getRequestParameters();
         HttpServletResponse response = (HttpServletResponse) page.getResponse().getContainerResponse();
+        this.params = this.page.getRequest().getRequestParameters();
         this.session = this.page.getSession();
         resolve(request, response, mode);
     }
@@ -97,12 +95,22 @@ public class SamlProcess {
 
     private void doLogout(HttpServletRequest request, HttpServletResponse response) {
         try {
-            LogoutRequestParams lparams = new LogoutRequestParams(
-                    request.getParameter("session_index"),
-                    request.getParameter("name_id")
-            );
 
+            AuthenticatedSession asession = (AuthenticatedSession) this.page.getSession();
+
+            LogoutRequestParams lparams = new LogoutRequestParams(
+                    asession.getSamlAuthInfo().getSessionIndex(),
+                    asession.getSamlAuthInfo().getNameId()
+            );
+            SamlAuthInfo.clearCookie(
+                    (WebRequest) this.page.getRequest(),
+                    (WebResponse) this.page.getResponse(),
+                    "samlprocess");
             auth.logout(null, lparams, false);
+            this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
+
+            asession.setSamlAuthInfo(new SamlAuthInfo());
+
             System.out.println(this.auth.isAuthenticated());
         } catch (IOException | SettingsException ex) {
             Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
@@ -111,7 +119,17 @@ public class SamlProcess {
     }
 
     private void checkLogin(HttpServletRequest request, HttpServletResponse response) {
-        this.loginStatus = SamlProcess.STATUS_NOTAUTHENTICATED;
+        this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
+
+        AuthenticatedSession asession = (AuthenticatedSession) this.page.getSession();
+        SamlAuthInfo sinfo = asession.getSamlAuthInfo();
+        if (sinfo != null) {
+            if (!sinfo.getSessionIndex().isEmpty()) {
+                this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
+                return;
+            }
+        }
+
         String param = this.params.getParameterValue("SAMLResponse").toString();
         if (param != null) {
             try {
@@ -119,7 +137,11 @@ public class SamlProcess {
                 Document samlResponseDocument = Util.loadXML(samlResponseString);
                 if (samlResponseDocument != null) {
                     this.auth.processResponse();
-                    this.loginStatus = SamlProcess.STATUS_AUTHENTICATED;
+                    if (this.auth.isAuthenticated()) {
+                        this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
+                    } else {
+                        Logger.getLogger(this.getClass().getName()).log(Level.INFO, this.auth.getErrors().toString());
+                    }
                 }
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
@@ -130,15 +152,15 @@ public class SamlProcess {
     }
 
     private void doLogin(HttpServletRequest request, HttpServletResponse response) {
-        this.loginStatus = SamlProcess.STATUS_NOTAUTHENTICATED;
+        this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
         try {
             this.checkLogin(request, response);
-            if (this.loginStatus == SamlProcess.STATUS_NOTAUTHENTICATED) {
+            if (this.loginStatus == SamlAuthInfo.STATUS_NOTAUTHENTICATED) {
                 auth.login();
-                this.loginStatus = SamlProcess.STATUS_AUTHENTICATED;
-            } 
-        } catch (IOException | SettingsException  ex) {
+                this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
+            }
+        } catch (IOException | SettingsException ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -150,4 +172,5 @@ public class SamlProcess {
     public Auth getAuth() {
         return this.auth;
     }
+
 }
