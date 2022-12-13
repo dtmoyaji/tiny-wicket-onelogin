@@ -51,7 +51,7 @@ public class SamlProcess {
     private WebPage page;
 
     private Auth auth;
-    
+
     private SamlAuthInfo samlAuthInfo;
 
     private Session session;
@@ -161,14 +161,16 @@ public class SamlProcess {
             }
         } catch (IOException | SettingsException ex) {
             Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public int getStatus() {
         return this.loginStatus;
     }
-    
-    public SamlAuthInfo getAuthInfo(){
+
+    public SamlAuthInfo getAuthInfo() {
         return this.samlAuthInfo;
     }
 

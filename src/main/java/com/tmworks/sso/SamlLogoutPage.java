@@ -15,6 +15,7 @@
  */
 package com.tmworks.sso;
 
+import com.tmworks.MainPage;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.http.WebRequest;
@@ -45,8 +46,7 @@ public class SamlLogoutPage extends WebPage {
 
             WebRequest webRequest = (WebRequest) this.getRequestCycle().getRequest();
 
-            this.getSession().invalidateNow();
-            this.getSession().clear();
+            this.setResponsePage(MainPage.class);
 
         }
 

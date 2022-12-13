@@ -58,11 +58,20 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         this.put("SAMLSessinIndex", this.cupsul(sessionIndex));
         this.put("SAMLAttributes",
                 this.cupsul(this.packAttributes()));
+        
     }
 
     private ArrayList<String> cupsul(String value) {
         ArrayList<String> rvalue = new ArrayList<>();
         rvalue.add(value);
+        return rvalue;
+    }
+
+    private String uncupsul(ArrayList<String> value) {
+        if (value.isEmpty()) {
+            return "";
+        }
+        String rvalue = value.get(0);
         return rvalue;
     }
 
@@ -85,6 +94,10 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
     }
 
     public Map<String, List<String>> getAttributes() {
+        if (this.attributes == null) {
+            this.attributes = new LinkedHashMap<>();
+            this.unpackAttributes();
+        }
         return this.attributes;
     }
 
@@ -110,7 +123,12 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         return this.nameId;
     }
 
-    public String packAttributes() {
+    /**
+     * user attributes covert from Map to String.
+     *
+     * @return
+     */
+    private String packAttributes() {
         String paramv = "";
         if (this.attributes != null) {
             Set<String> keys = this.attributes.keySet();
@@ -135,7 +153,13 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         return paramv;
     }
 
-    public void unpackAttributes(String xvalue) {
+    /**
+     * user attributes convert from String to Map.
+     *
+     * @param xvalue
+     */
+    private void unpackAttributes() {
+        String xvalue = this.uncupsul(this.get("SAMLAttributes"));
         if (!xvalue.isEmpty()) {
             String[] paramsrc = xvalue.split(SamlAuthInfo.COOKIE_ITEM_END);
             for (String param : paramsrc) {

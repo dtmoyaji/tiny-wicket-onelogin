@@ -17,6 +17,7 @@ package com.tmworks.sso;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -77,14 +78,16 @@ public class SamlSignControlPanel extends Panel {
     }
 
     public void showStatus(WebPage parent) {
-        AuthenticatedSession session = (AuthenticatedSession) this.getSession();
-
+        AuthenticatedSession session = (AuthenticatedSession) parent.getSession();
         SamlProcess sprocess = new SamlProcess(parent, SamlProcess.MODE_CHECKLOGIN);
         if (sprocess.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
             this.authInfo = sprocess.getAuthInfo();
 
             session.setSamlAuthInfo(this.authInfo);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SamlAuthInfo Generaterd.");
+            Roles roles = session.getRoles();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO,
+                    roles.toString()
+                    );
 
             String data = authInfo.getAttributes().toString();
             data += "<br />[session-index]:" + this.authInfo.getSessionIndex();

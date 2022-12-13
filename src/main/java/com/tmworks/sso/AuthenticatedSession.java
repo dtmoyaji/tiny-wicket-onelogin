@@ -15,6 +15,7 @@
  */
 package com.tmworks.sso;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
@@ -27,8 +28,10 @@ import org.apache.wicket.request.Request;
 public class AuthenticatedSession extends AuthenticatedWebSession {
 
     private final Request request;
-    
+
     private SamlAuthInfo SamlAuthInfo;
+    
+    private Roles roles = new Roles();
 
     public AuthenticatedSession(Request request) {
         super(request);
@@ -58,11 +61,13 @@ public class AuthenticatedSession extends AuthenticatedWebSession {
 
     @Override
     public Roles getRoles() {
-        return new Roles();
+        return this.roles;
     }
 
     public void setSamlAuthInfo(SamlAuthInfo info) {
         this.SamlAuthInfo = info;
+        List<String> attrs = this.SamlAuthInfo.getAttribute("Role");
+        this.getRoles().addAll(attrs);
         System.out.println(this.SamlAuthInfo.toString());
     }
 
