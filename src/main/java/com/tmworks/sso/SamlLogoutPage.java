@@ -18,7 +18,6 @@ package com.tmworks.sso;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.http.WebRequest;
-import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
@@ -45,7 +44,6 @@ public class SamlLogoutPage extends WebPage {
             //Auth auth = sprocess.getAuth();
 
             WebRequest webRequest = (WebRequest) this.getRequestCycle().getRequest();
-            SamlAuthInfo.clearCookie(webRequest, (WebResponse) this.getRequestCycle().getResponse(), "samlprocess");
 
             this.getSession().invalidateNow();
             this.getSession().clear();

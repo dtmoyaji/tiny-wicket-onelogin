@@ -23,11 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.http.Cookie;
-import org.apache.wicket.request.http.WebRequest;
-import org.apache.wicket.request.http.WebResponse;
 
 /**
  *
@@ -115,19 +110,6 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         return this.nameId;
     }
 
-    public void saveCookie(WebResponse webResponse, String cookiePrefix, int maxTime) {
-        webResponse.addCookie(
-                createCookie(cookiePrefix + COOKIE_SESSIONTINDEX, this.getSessionIndex(), maxTime)
-        );
-        webResponse.addCookie(
-                createCookie(cookiePrefix + COOKIE_NAMEID, this.getNameId(), maxTime)
-        );
-        String paramv = this.packAttributes();
-        webResponse.addCookie(
-                createCookie(cookiePrefix + COOKIE_PARAMETERS, paramv, maxTime)
-        );
-    }
-
     public String packAttributes() {
         String paramv = "";
         if (this.attributes != null) {
@@ -153,12 +135,6 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         return paramv;
     }
 
-    public static Cookie createCookie(String name, String value, int MaxTime) {
-        Cookie rvalue = new Cookie(name, value);
-        rvalue.setMaxAge(MaxTime);
-        return rvalue;
-    }
-
     public void unpackAttributes(String xvalue) {
         if (!xvalue.isEmpty()) {
             String[] paramsrc = xvalue.split(SamlAuthInfo.COOKIE_ITEM_END);
@@ -179,52 +155,4 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
             }
         }
     }
-
-    public boolean loadCookie(WebRequest webRequest, String cookiePrefix) {
-        try {
-
-            this.sessionIndex = this.getCookieValue(webRequest, cookiePrefix + COOKIE_SESSIONTINDEX);
-            this.nameId = this.getCookieValue(webRequest, cookiePrefix + COOKIE_NAMEID);
-            String params = this.getCookieValue(webRequest, cookiePrefix + COOKIE_PARAMETERS);
-            if (!params.isEmpty()) {
-                String[] paramsrc = params.split(SamlAuthInfo.COOKIE_ITEM_END);
-                for (String param : paramsrc) {
-                    String[] keyvalue = param.split(SamlAuthInfo.COOKIE_ITEM_EQUALS);
-                    String key = keyvalue[0];
-                    String value = keyvalue[1];
-                    if (key.toLowerCase().equals(SamlAuthInfo.COOKIE_KEY_ROLE)) {
-                        String[] values = value.split(SamlAuthInfo.COOKIE_ITEM_INNER_SEPARATOR);
-                        ArrayList<String> roleList = new ArrayList<>();
-                        roleList.addAll(Arrays.asList(values));
-                        this.attributes.put(key, roleList);
-                    } else {
-                        ArrayList<String> list = new ArrayList<>();
-                        list.add(value);
-                        this.attributes.put(key, list);
-                    }
-                }
-            }
-
-        } catch (NullPointerException ex) {
-            Logger.getLogger(AuthenticatedSession.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return !this.nameId.isEmpty();
-    }
-
-    private String getCookieValue(WebRequest webRequest, String cookieKey) {
-        String rvalue = "";
-        Cookie cookie = webRequest.getCookie(cookieKey);
-        if (cookie != null) {
-            rvalue = cookie.getValue();
-        }
-        return rvalue;
-    }
-
-    public static void clearCookie(WebRequest webRequest, WebResponse webResponse, String cookiePrefix) {
-        webResponse.addCookie(SamlAuthInfo.createCookie(cookiePrefix + COOKIE_NAMEID, "", 0));
-        webResponse.addCookie(SamlAuthInfo.createCookie(cookiePrefix + COOKIE_SESSIONTINDEX, "", 0));
-        webResponse.addCookie(SamlAuthInfo.createCookie(cookiePrefix + COOKIE_PARAMETERS, "", 0));
-        webResponse.disableCaching();
-    }
-
 }

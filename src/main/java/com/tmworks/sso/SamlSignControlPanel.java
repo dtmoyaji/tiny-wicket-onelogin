@@ -23,7 +23,6 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
@@ -82,8 +81,7 @@ public class SamlSignControlPanel extends Panel {
 
         SamlProcess sprocess = new SamlProcess(parent, SamlProcess.MODE_CHECKLOGIN);
         if (sprocess.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
-            this.authInfo = new SamlAuthInfo(sprocess.getAuth());
-            this.authInfo.saveCookie((WebResponse) parent.getRequestCycle().getResponse(), "samlprocess", 3600);
+            this.authInfo = sprocess.getAuthInfo();
 
             session.setSamlAuthInfo(this.authInfo);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SamlAuthInfo Generaterd.");

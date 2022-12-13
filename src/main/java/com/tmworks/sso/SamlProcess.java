@@ -30,8 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.IRequestParameters;
-import org.apache.wicket.request.http.WebRequest;
-import org.apache.wicket.request.http.WebResponse;
 import org.w3c.dom.Document;
 
 /**
@@ -53,6 +51,8 @@ public class SamlProcess {
     private WebPage page;
 
     private Auth auth;
+    
+    private SamlAuthInfo samlAuthInfo;
 
     private Session session;
 
@@ -76,6 +76,7 @@ public class SamlProcess {
     private void resolve(HttpServletRequest request, HttpServletResponse response, int mode) {
         try {
             this.auth = new Auth(request, response);
+            this.samlAuthInfo = new SamlAuthInfo(this.auth);
 
             switch (mode) {
                 case MODE_LOGIN:
@@ -102,10 +103,6 @@ public class SamlProcess {
                     asession.getSamlAuthInfo().getSessionIndex(),
                     asession.getSamlAuthInfo().getNameId()
             );
-            SamlAuthInfo.clearCookie(
-                    (WebRequest) this.page.getRequest(),
-                    (WebResponse) this.page.getResponse(),
-                    "samlprocess");
             auth.logout(null, lparams, false);
             this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
@@ -125,6 +122,7 @@ public class SamlProcess {
         SamlAuthInfo sinfo = asession.getSamlAuthInfo();
         if (sinfo != null) {
             if (!sinfo.getSessionIndex().isEmpty()) {
+                this.samlAuthInfo = sinfo;
                 this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
                 return;
             }
@@ -138,6 +136,7 @@ public class SamlProcess {
                 if (samlResponseDocument != null) {
                     this.auth.processResponse();
                     if (this.auth.isAuthenticated()) {
+                        this.samlAuthInfo = new SamlAuthInfo(this.auth);
                         this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
                     } else {
                         Logger.getLogger(this.getClass().getName()).log(Level.INFO, this.auth.getErrors().toString());
@@ -167,6 +166,10 @@ public class SamlProcess {
 
     public int getStatus() {
         return this.loginStatus;
+    }
+    
+    public SamlAuthInfo getAuthInfo(){
+        return this.samlAuthInfo;
     }
 
     public Auth getAuth() {
