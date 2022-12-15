@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 bythe.
+ * Copyright 2022 DtmOyaji.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.w3c.dom.Document;
 
 /**
  *
- * @author bythe
+ * @author DtmOyaji
  */
 public class SamlProcess {
 
