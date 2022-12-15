@@ -27,8 +27,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
- *
- * @author MURAKAMI Takahiro <daianji@gmail.com>
+ * @author DtmOyaji
  */
 public class SamlSignControlPanel extends Panel {
 
@@ -78,7 +77,7 @@ public class SamlSignControlPanel extends Panel {
     }
 
     public void showStatus(WebPage parent) {
-        AuthenticatedSession session = (AuthenticatedSession) parent.getSession();
+        SamlAuthedSession session = (SamlAuthedSession) parent.getSession();
         SamlProcess sprocess = new SamlProcess(parent, SamlProcess.MODE_CHECKLOGIN);
         if (sprocess.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
             this.authInfo = sprocess.getAuthInfo();

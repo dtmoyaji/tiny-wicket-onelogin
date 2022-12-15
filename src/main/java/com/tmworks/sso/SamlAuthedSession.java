@@ -25,7 +25,7 @@ import org.apache.wicket.request.Request;
  *
  * @author bythe
  */
-public class AuthenticatedSession extends AuthenticatedWebSession {
+public class SamlAuthedSession extends AuthenticatedWebSession {
 
     private final Request request;
 
@@ -33,7 +33,7 @@ public class AuthenticatedSession extends AuthenticatedWebSession {
     
     private Roles roles = new Roles();
 
-    public AuthenticatedSession(Request request) {
+    public SamlAuthedSession(Request request) {
         super(request);
         this.request = request;
     }
@@ -68,7 +68,7 @@ public class AuthenticatedSession extends AuthenticatedWebSession {
         this.SamlAuthInfo = info;
         List<String> attrs = this.SamlAuthInfo.getAttribute("Role");
         this.getRoles().addAll(attrs);
-        System.out.println(this.SamlAuthInfo.toString());
+        //System.out.println(this.SamlAuthInfo.toString());
     }
 
     public SamlAuthInfo getSamlAuthInfo() {

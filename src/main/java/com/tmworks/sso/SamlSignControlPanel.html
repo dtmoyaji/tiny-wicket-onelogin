@@ -20,17 +20,19 @@ limitations under the License.
        lang="ja">
     <head>
         <title>TODO supply a title</title>
-        <meta charset="UTF-8">
+        <meta charset="UTF-8" />
     </head>
     <body>
         <wicket:panel>
-            <form wicket:id="loginForm">
-                <button wicket:id="loginButton">ログアウトボタン</button>
-            </form>
-            <form wicket:id="logoutForm">
-                <button wicket:id="logoutButton">ログアウトボタン</button>
-            </form>
-            <label wicket:id="info"></label>
+            <div class="wicket-onelogin panel">
+                <form wicket:id="loginForm" class="wicket-onelogin panel login">
+                    <button wicket:id="loginButton" class="wicket-onelogin button logout">ログアウトボタン</button>
+                </form>
+                <form wicket:id="logoutForm" class="wicket-onelogin panel login">
+                    <button wicket:id="logoutButton" class="wicket-onelogin button login">ログアウトボタン</button>
+                </form>
+                <label wicket:id="info"></label>
+            </div>
         </wicket:panel>
     </body>
 </html>

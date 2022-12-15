@@ -1,6 +1,6 @@
 package com.tmworks;
 
-import com.tmworks.sso.AuthenticatedSession;
+import com.tmworks.sso.SamlAuthedSession;
 import com.tmworks.sso.SamlLogoutPage;
 import com.tmworks.sso.SamlSigninPage;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
@@ -15,7 +15,7 @@ import org.apache.wicket.markup.html.WebPage;
  *
  * @see com.tmworks.Start#main(String[])
  */
-public class WicketApplication extends AuthenticatedWebApplication {
+public class SamlWicketApplication extends AuthenticatedWebApplication {
 
     /**
      * @see org.apache.wicket.Application#init()
@@ -33,8 +33,14 @@ public class WicketApplication extends AuthenticatedWebApplication {
                 .add(CSPDirective.STYLE_SRC, CSPDirectiveSrcValue.SELF)
                 .add(CSPDirective.STYLE_SRC, "https://fonts.googleapis.com/css")
                 .add(CSPDirective.FONT_SRC, "https://fonts.gstatic.com");
+        
+        this.mountSamlPages();
+    }
 
-        // add your configuration here
+    /**
+     * 必要に応じて継承し、SamlSinginPageとSamlLogoutPageのマウント先を変更する。
+     */
+    protected void mountSamlPages() {
         this.mountPage("SamlLogin", SamlSigninPage.class);
         this.mountPage("SamlLogout", SamlLogoutPage.class);
     }
@@ -44,13 +50,13 @@ public class WicketApplication extends AuthenticatedWebApplication {
      */
     @Override
     public Class<? extends WebPage> getHomePage() {
-        return MainPage.class;
+        return SamlMainPage.class;
 
     }
 
     @Override
     protected Class<? extends AbstractAuthenticatedWebSession> getWebSessionClass() {
-        return AuthenticatedSession.class;
+        return SamlAuthedSession.class;
     }
 
     @Override

@@ -15,10 +15,9 @@
  */
 package com.tmworks.sso;
 
-import com.tmworks.MainPage;
+import com.tmworks.SamlMainPage;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
@@ -34,19 +33,14 @@ public class SamlLogoutPage extends WebPage {
 
         SamlProcess process = new SamlProcess(this, SamlProcess.MODE_CHECKLOGIN);
         if (process.getStatus() == SamlAuthInfo.STATUS_AUTHENTICATED) {
-            AuthenticatedSession authSession = (AuthenticatedSession) this.getSession();
+            SamlAuthedSession authSession = (SamlAuthedSession) this.getSession();
 
             String responseXml = authSession.getSamlAuthInfo().getNameId();
-            System.out.println(responseXml);
             responseXml = authSession.getSamlAuthInfo().getSessionIndex();
-            System.out.println(responseXml);
 
-            SamlProcess sprocess = new SamlProcess(this, SamlProcess.MODE_LOGOUT);
-            //Auth auth = sprocess.getAuth();
+            new SamlProcess(this, SamlProcess.MODE_LOGOUT);
 
-            WebRequest webRequest = (WebRequest) this.getRequestCycle().getRequest();
-
-            this.setResponsePage(MainPage.class);
+            this.setResponsePage(SamlMainPage.class);
 
         }
 

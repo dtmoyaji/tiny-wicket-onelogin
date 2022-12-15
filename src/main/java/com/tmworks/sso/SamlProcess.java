@@ -20,7 +20,7 @@ import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.exception.SettingsException;
 import com.onelogin.saml2.logout.LogoutRequestParams;
 import com.onelogin.saml2.util.Util;
-import com.tmworks.MainPage;
+import com.tmworks.SamlMainPage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
@@ -97,7 +97,7 @@ public class SamlProcess {
     private void doLogout(HttpServletRequest request, HttpServletResponse response) {
         try {
 
-            AuthenticatedSession asession = (AuthenticatedSession) this.page.getSession();
+            SamlAuthedSession asession = (SamlAuthedSession) this.page.getSession();
 
             LogoutRequestParams lparams = new LogoutRequestParams(
                     asession.getSamlAuthInfo().getSessionIndex(),
@@ -118,7 +118,7 @@ public class SamlProcess {
     private void checkLogin(HttpServletRequest request, HttpServletResponse response) {
         this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
-        AuthenticatedSession asession = (AuthenticatedSession) this.page.getSession();
+        SamlAuthedSession asession = (SamlAuthedSession) this.page.getSession();
         SamlAuthInfo sinfo = asession.getSamlAuthInfo();
         if (sinfo != null) {
             if (!sinfo.getSessionIndex().isEmpty()) {
@@ -160,7 +160,7 @@ public class SamlProcess {
                 this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
             }
         } catch (IOException | SettingsException ex) {
-            Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SamlMainPage.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
