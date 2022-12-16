@@ -1,8 +1,8 @@
 package com.tmworks;
 
-import com.tmworks.sso.SamlAuthedSession;
-import com.tmworks.sso.SamlLogoutPage;
-import com.tmworks.sso.SamlSigninPage;
+import com.tmworks.sso.SamlSLOPage;
+import com.tmworks.sso.SamlSSOPage;
+import com.tmworks.sso.SamlSession;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.csp.CSPDirective;
@@ -10,12 +10,11 @@ import org.apache.wicket.csp.CSPDirectiveSrcValue;
 import org.apache.wicket.markup.html.WebPage;
 
 /**
- * Application object for your web application. If you want to run this
- * application without deploying, run the Start class.
+ * このアプリケーションを継承し、メソッドを作成すると、SAMLを使ったユーザー認証が出来る。
  *
  * @see com.tmworks.Start#main(String[])
  */
-public class SamlWicketApplication extends AuthenticatedWebApplication {
+public abstract class SamlWicketApplication extends AuthenticatedWebApplication implements ISamlWicketApplication {
 
     /**
      * @see org.apache.wicket.Application#init()
@@ -33,16 +32,16 @@ public class SamlWicketApplication extends AuthenticatedWebApplication {
                 .add(CSPDirective.STYLE_SRC, CSPDirectiveSrcValue.SELF)
                 .add(CSPDirective.STYLE_SRC, "https://fonts.googleapis.com/css")
                 .add(CSPDirective.FONT_SRC, "https://fonts.gstatic.com");
-        
-        this.mountSamlPages();
+
+        this.mountSamlPages(this.getSSOPageMountPoint(), this.getSLOPageMountPoint());
     }
 
     /**
      * 必要に応じて継承し、SamlSinginPageとSamlLogoutPageのマウント先を変更する。
      */
-    protected void mountSamlPages() {
-        this.mountPage("SamlLogin", SamlSigninPage.class);
-        this.mountPage("SamlLogout", SamlLogoutPage.class);
+    private void mountSamlPages(String loginPagePoint, String logOutPagePoint) {
+        this.mountPage(loginPagePoint, SamlSSOPage.class);
+        this.mountPage(logOutPagePoint, SamlSLOPage.class);
     }
 
     /**
@@ -56,11 +55,11 @@ public class SamlWicketApplication extends AuthenticatedWebApplication {
 
     @Override
     protected Class<? extends AbstractAuthenticatedWebSession> getWebSessionClass() {
-        return SamlAuthedSession.class;
+        return SamlSession.class;
     }
 
     @Override
     protected Class<? extends WebPage> getSignInPageClass() {
-        return SamlSigninPage.class;
+        return SamlSSOPage.class;
     }
 }

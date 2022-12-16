@@ -15,20 +15,20 @@
  */
 package com.tmworks.sso;
 
-import com.tmworks.SamlMainPage;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
+ * Saml Single Sign On Page.
  *
  * @author DtmOyaji
  */
-public class SamlSigninPage extends WebPage {
+public class SamlSSOPage extends WebPage {
 
     Roles myRole;
 
-    public SamlSigninPage(final PageParameters params) {
+    public SamlSSOPage(final PageParameters params) {
         super(params);
 
         // SAML処理
@@ -39,10 +39,10 @@ public class SamlSigninPage extends WebPage {
 
         if (checkLogin.getStatus() == SamlAuthInfo.STATUS_NOTAUTHENTICATED) {
             checkLogin = new SamlProcess(this, SamlProcess.MODE_LOGIN);
-        }else{
-            SamlAuthedSession asession = (SamlAuthedSession) this.getSession();
+        } else {
+            SamlSession asession = (SamlSession) this.getSession();
             asession.setSamlAuthInfo(checkLogin.getAuthInfo());
-            this.setResponsePage(SamlMainPage.class);
+            this.setResponsePage(this.getApplication().getHomePage());
         }
 
     }

@@ -36,14 +36,16 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
 
     public static final int STATUS_AUTHENTICATED = 1;
 
-    public static final String COOKIE_SESSIONTINDEX = "-sessionIndex";
-    public static final String COOKIE_NAMEID = "-nameId";
-    public static final String COOKIE_PARAMETERS = "-parameters";
+    public static final String KEY_ROLE = "role";
+    public static final String ALTER_EQUALS = "/";
+    public static final String ALTER_END = ":";
+    public static final String ALTER_SEPARATER = "#";
 
-    public static final String COOKIE_KEY_ROLE = "role";
-    public static final String COOKIE_ITEM_EQUALS = "/";
-    public static final String COOKIE_ITEM_END = ":";
-    public static final String COOKIE_ITEM_INNER_SEPARATOR = "#";
+    public static final String SAML_NAMEID = "SAMLNameId";
+    public static final String SAML_SESSION_INDEX = "SAMLSessionIndex";
+    public static final String SAML_ATTRIBUTES = "SAMLAttributes";
+
+    public static final String DISPLAYNAME_KEY = "DisplayNameKey";
 
     private String sessionIndex;
     private String nameId;
@@ -54,11 +56,9 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         this.sessionIndex = auth.getSessionIndex();
         this.nameId = auth.getNameId();
         this.attributes = auth.getAttributes();
-        this.put("SAMLNameId", this.cupsul(nameId));
-        this.put("SAMLSessinIndex", this.cupsul(sessionIndex));
-        this.put("SAMLAttributes",
-                this.cupsul(this.packAttributes()));
-        
+        this.setAttributeString(SAML_NAMEID, nameId);
+        this.setAttributeString(SAML_SESSION_INDEX, sessionIndex);
+        this.setAttributeString(SAML_ATTRIBUTES, this.packAttributes());
     }
 
     private ArrayList<String> cupsul(String value) {
@@ -68,6 +68,9 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
     }
 
     private String uncupsul(ArrayList<String> value) {
+        if (value == null){
+            return "";
+        }
         if (value.isEmpty()) {
             return "";
         }
@@ -79,10 +82,9 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
         this.sessionIndex = "";
         this.nameId = "";
         this.attributes = null;
-        this.put("SAMLNameId", this.cupsul(nameId));
-        this.put("SAMLSessinIndex", this.cupsul(sessionIndex));
-        this.put("SAMLAttributes",
-                this.cupsul(this.packAttributes()));
+        this.setAttributeString(SAML_NAMEID, nameId);
+        this.setAttributeString(SAML_SESSION_INDEX, sessionIndex);
+        this.setAttributeString(SAML_ATTRIBUTES, this.packAttributes());
     }
 
     public List<String> getAttribute(String key) {
@@ -135,17 +137,17 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
             for (String key : keys) {
                 List<String> value = this.attributes.get(key);
                 if (!value.isEmpty()) {
-                    if (key.toLowerCase().equals(SamlAuthInfo.COOKIE_KEY_ROLE)) {
+                    if (key.toLowerCase().equals(SamlAuthInfo.KEY_ROLE)) {
                         String rolelist = "";
                         for (String item : value) {
-                            rolelist += COOKIE_ITEM_INNER_SEPARATOR + item;
+                            rolelist += ALTER_SEPARATER + item;
                         }
                         if (!rolelist.isEmpty()) {
                             rolelist = rolelist.substring(1);
                         }
-                        paramv += key + COOKIE_ITEM_EQUALS + rolelist + COOKIE_ITEM_END;
+                        paramv += key + ALTER_EQUALS + rolelist + ALTER_END;
                     } else {
-                        paramv += key + COOKIE_ITEM_EQUALS + value.get(0) + COOKIE_ITEM_END;
+                        paramv += key + ALTER_EQUALS + value.get(0) + ALTER_END;
                     }
                 }
             }
@@ -159,15 +161,15 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
      * @param xvalue
      */
     private void unpackAttributes() {
-        String xvalue = this.uncupsul(this.get("SAMLAttributes"));
+        String xvalue = this.uncupsul(this.get(SAML_ATTRIBUTES));
         if (!xvalue.isEmpty()) {
-            String[] paramsrc = xvalue.split(SamlAuthInfo.COOKIE_ITEM_END);
+            String[] paramsrc = xvalue.split(SamlAuthInfo.ALTER_END);
             for (String param : paramsrc) {
-                String[] keyvalue = param.split(SamlAuthInfo.COOKIE_ITEM_EQUALS);
+                String[] keyvalue = param.split(SamlAuthInfo.ALTER_EQUALS);
                 String key = keyvalue[0];
                 String value = keyvalue[1];
-                if (key.toLowerCase().equals(SamlAuthInfo.COOKIE_KEY_ROLE)) {
-                    String[] values = value.split(SamlAuthInfo.COOKIE_ITEM_INNER_SEPARATOR);
+                if (key.toLowerCase().equals(SamlAuthInfo.KEY_ROLE)) {
+                    String[] values = value.split(SamlAuthInfo.ALTER_SEPARATER);
                     ArrayList<String> roleList = new ArrayList<>();
                     roleList.addAll(Arrays.asList(values));
                     this.attributes.put(key, roleList);
@@ -178,5 +180,13 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
                 }
             }
         }
+    }
+
+    public final void setAttributeString(String paramName, String paramValue) {
+        this.put(paramName, this.cupsul(paramValue));
+    }
+
+    public String getAttributeString(String attrName) {
+        return this.uncupsul((ArrayList<String>) this.getAttribute(attrName));
     }
 }
