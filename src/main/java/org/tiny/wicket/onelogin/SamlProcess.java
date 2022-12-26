@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.tiny.sso;
+package org.tiny.wicket.onelogin;
 
 import com.onelogin.saml2.Auth;
 import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.exception.SettingsException;
 import com.onelogin.saml2.logout.LogoutRequestParams;
 import com.onelogin.saml2.util.Util;
-import org.tiny.SamlMainPage;
+import org.tiny.wicket.SamlMainPage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;

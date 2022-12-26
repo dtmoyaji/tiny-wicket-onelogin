@@ -1,8 +1,8 @@
-package org.tiny;
+package org.tiny.wicket;
 
-import org.tiny.sso.SamlSLOPage;
-import org.tiny.sso.SamlSSOPage;
-import org.tiny.sso.SamlSession;
+import org.tiny.wicket.onelogin.SamlSLOPage;
+import org.tiny.wicket.onelogin.SamlSSOPage;
+import org.tiny.wicket.onelogin.SamlSession;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.csp.CSPDirective;

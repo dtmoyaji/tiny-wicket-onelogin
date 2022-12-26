@@ -1,6 +1,6 @@
-package org.tiny;
+package org.tiny.wicket;
 
-import org.tiny.sso.SamlSignControlPanel;
+import org.tiny.wicket.onelogin.SamlSignControlPanel;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
