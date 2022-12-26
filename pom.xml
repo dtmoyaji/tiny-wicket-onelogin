@@ -49,6 +49,15 @@
         <!-- allowed values: R7, 1.0, 1.5, 2.0 or none -->
         <wtp.version>none</wtp.version>
     </properties>
+    
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/dtmoyaji/tiny-wicket-onelogin</url>
+        </repository>
+    </distributionManagement>
+    
     <dependencies>
         <!--  WICKET DEPENDENCIES -->
         <dependency>
