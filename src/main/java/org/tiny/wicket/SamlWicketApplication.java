@@ -1,13 +1,13 @@
 package org.tiny.wicket;
 
-import org.tiny.wicket.onelogin.SamlSLOPage;
-import org.tiny.wicket.onelogin.SamlSSOPage;
-import org.tiny.wicket.onelogin.SamlSession;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.csp.CSPDirective;
 import org.apache.wicket.csp.CSPDirectiveSrcValue;
 import org.apache.wicket.markup.html.WebPage;
+import org.tiny.wicket.onelogin.SamlSLOPage;
+import org.tiny.wicket.onelogin.SamlSSOPage;
+import org.tiny.wicket.onelogin.SamlSession;
 
 /**
  * このアプリケーションを継承し、メソッドを作成すると、SAMLを使ったユーザー認証が出来る。
@@ -39,8 +39,8 @@ public abstract class SamlWicketApplication extends AuthenticatedWebApplication 
     /**
      * 必要に応じて継承し、SamlSinginPageとSamlLogoutPageのマウント先を変更する。
      */
-    private void mountSamlPages(String loginPagePoint, String logOutPagePoint) {
-        this.mountPage(loginPagePoint, SamlSSOPage.class);
+    private void mountSamlPages(String logInPagePoint, String logOutPagePoint) {
+        this.mountPage(logInPagePoint, SamlSSOPage.class);
         this.mountPage(logOutPagePoint, SamlSLOPage.class);
     }
 
