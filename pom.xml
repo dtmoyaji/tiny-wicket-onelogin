@@ -20,12 +20,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.tmworks</groupId>
-    <artifactId>wicket-onelogin</artifactId>
+    <groupId>org.tiny</groupId>
+    <artifactId>tiny-wicket-onelogin</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0</version>
     <!-- TODO project name  -->
-    <name>wicket-onelogin</name>
+    <name>tiny-wicket-onelogin</name>
     <description></description>
     <!--
             <organization>

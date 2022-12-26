@@ -1,6 +1,6 @@
-package com.tmworks;
+package org.tiny;
 
-import com.tmworks.sso.SamlSignControlPanel;
+import org.tiny.sso.SamlSignControlPanel;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 

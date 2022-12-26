@@ -1,8 +1,8 @@
-package com.tmworks;
+package org.tiny;
 
-import com.tmworks.sso.SamlSLOPage;
-import com.tmworks.sso.SamlSSOPage;
-import com.tmworks.sso.SamlSession;
+import org.tiny.sso.SamlSLOPage;
+import org.tiny.sso.SamlSSOPage;
+import org.tiny.sso.SamlSession;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.csp.CSPDirective;

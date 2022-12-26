@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tmworks.sso;
+package org.tiny.sso;
 
 import com.onelogin.saml2.Auth;
 import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.exception.SettingsException;
 import com.onelogin.saml2.logout.LogoutRequestParams;
 import com.onelogin.saml2.util.Util;
-import com.tmworks.SamlMainPage;
+import org.tiny.SamlMainPage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;

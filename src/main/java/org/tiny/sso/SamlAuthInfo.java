@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tmworks.sso;
+package org.tiny.sso;
 
 import com.onelogin.saml2.Auth;
 import java.io.Serializable;
