@@ -20,7 +20,6 @@ import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.exception.SettingsException;
 import com.onelogin.saml2.logout.LogoutRequestParams;
 import com.onelogin.saml2.util.Util;
-import org.tiny.wicket.SamlMainPage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
@@ -29,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.IRequestParameters;
+import org.tiny.wicket.SamlMainPage;
 import org.w3c.dom.Document;
 
 /**
@@ -43,6 +43,10 @@ public class SamlProcess {
 
     public static final int MODE_LOGOUT = 2;
 
+    public static final String KEY_SAML_RESPONSE = "SAMLResponse";
+
+    public static final String DEFAULT_CODE = "UTF-8";
+
     private int loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
     private IRequestParameters params;
@@ -53,11 +57,47 @@ public class SamlProcess {
 
     private SamlAuthInfo samlAuthInfo;
 
+    private String settingFile = null;
+
+    /**
+     * 初期化。プロパティファイル名は規定値(onelogin.saml.sample.properties)
+     * @param request
+     * @param response
+     * @param mode 
+     */
     public SamlProcess(HttpServletRequest request, HttpServletResponse response, int mode) {
         resolve(request, response, mode);
     }
 
+    /**
+     * 初期化。プロパティファイルを指定する。
+     * @param settingFilePath
+     * @param request
+     * @param response
+     * @param mode 
+     */
+    public SamlProcess(String settingFilePath, HttpServletRequest request, HttpServletResponse response, int mode) {
+        this.settingFile = settingFilePath;
+        resolve(request, response, mode);
+    }
+    
+    /**
+     * 初期化。WebPageよりリクエストとレスポンスを抽出して動作する。プロパティファイルは規定値。
+     * @param page
+     * @param mode 
+     */
     public SamlProcess(WebPage page, int mode) {
+        this.resolve(page, mode);
+    }
+
+    /**
+     * 初期化。WebPageよりリクエストとレスポンスを抽出して動作する。プロパティファイル名を指定する。
+     * @param settingFilePath
+     * @param page
+     * @param mode 
+     */
+    public SamlProcess(String settingFilePath, WebPage page, int mode) {
+        this.settingFile = settingFilePath;
         this.resolve(page, mode);
     }
 
@@ -69,24 +109,33 @@ public class SamlProcess {
         resolve(request, response, mode);
     }
 
-    private void resolve(HttpServletRequest request, HttpServletResponse response, int mode) {
+    private Auth buildAuth(HttpServletRequest request, HttpServletResponse response) {
+        Auth rvalue = null;
         try {
-            this.auth = new Auth(request, response);
-            this.samlAuthInfo = new SamlAuthInfo(this.auth);
-
-            switch (mode) {
-                case MODE_LOGIN:
-                    this.doLogin();
-                    break;
-                case MODE_CHECKLOGIN:
-                    this.checkLogin();
-                    break;
-                case MODE_LOGOUT:
-                    this.doLogout();
-                    break;
+            if (this.settingFile == null) {
+                rvalue = new Auth(request, response);
+            } else {
+                rvalue = new Auth(this.settingFile, request, response);
             }
         } catch (IOException | SettingsException | Error ex) {
             Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return rvalue;
+    }
+
+    private void resolve(HttpServletRequest request, HttpServletResponse response, int mode) {
+        this.auth = this.buildAuth(request, response);
+        this.samlAuthInfo = new SamlAuthInfo(this.auth);
+        switch (mode) {
+            case MODE_LOGIN:
+                this.doLogin();
+                break;
+            case MODE_CHECKLOGIN:
+                this.checkLogin();
+                break;
+            case MODE_LOGOUT:
+                this.doLogout();
+                break;
         }
     }
 
@@ -125,10 +174,10 @@ public class SamlProcess {
             }
         }
 
-        String param = this.params.getParameterValue("SAMLResponse").toString();
+        String param = this.params.getParameterValue(KEY_SAML_RESPONSE).toString();
         if (param != null) {
             try {
-                String samlResponseString = new String(Util.base64decoder(param), "UTF-8");
+                String samlResponseString = new String(Util.base64decoder(param), DEFAULT_CODE);
                 Document samlResponseDocument = Util.loadXML(samlResponseString);
                 if (samlResponseDocument != null) {
                     this.auth.processResponse();
@@ -153,7 +202,7 @@ public class SamlProcess {
         try {
             this.checkLogin();
             if (this.loginStatus == SamlAuthInfo.STATUS_NOTAUTHENTICATED) {
-                auth.login();
+                this.auth.login();
                 this.loginStatus = SamlAuthInfo.STATUS_AUTHENTICATED;
             }
         } catch (IOException | SettingsException ex) {
