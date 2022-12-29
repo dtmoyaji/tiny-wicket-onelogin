@@ -123,9 +123,17 @@ public class SamlProcess {
         return rvalue;
     }
 
+    /**
+     * ログイン、ログインチェック、ログアウトの振り分け処理
+     * @param request
+     * @param response
+     * @param mode 
+     */
     private void resolve(HttpServletRequest request, HttpServletResponse response, int mode) {
+        
         this.auth = this.buildAuth(request, response);
         this.samlAuthInfo = new SamlAuthInfo(this.auth);
+        
         switch (mode) {
             case MODE_LOGIN:
                 this.doLogin();
@@ -137,8 +145,12 @@ public class SamlProcess {
                 this.doLogout();
                 break;
         }
+        
     }
 
+    /**
+     * ログアウト実行
+     */
     private void doLogout() {
         try {
 
@@ -158,10 +170,14 @@ public class SamlProcess {
         } catch (IOException | SettingsException ex) {
             Logger.getLogger(SamlProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
+    /**
+     * ログイン状態の確認。
+     * 結果はgetStatusで取得する。
+     */
     private void checkLogin() {
+        
         this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
         SamlSession asession = (SamlSession) this.page.getSession();
@@ -178,7 +194,7 @@ public class SamlProcess {
         if (param != null) {
             try {
                 String samlResponseString = new String(Util.base64decoder(param), DEFAULT_CODE);
-                Document samlResponseDocument = Util.loadXML(samlResponseString);
+                Document samlResponseDocument = Util.loadXML(samlResponseString); // エラー発生個所
                 if (samlResponseDocument != null) {
                     this.auth.processResponse();
                     if (this.auth.isAuthenticated()) {
@@ -196,6 +212,10 @@ public class SamlProcess {
         }
     }
 
+    /**
+     * ログインの実行
+     * 実行結果はgetStatusで取得する。
+     */
     private void doLogin() {
         this.loginStatus = SamlAuthInfo.STATUS_NOTAUTHENTICATED;
 
@@ -210,14 +230,28 @@ public class SamlProcess {
         }
     }
 
+    /**
+     * ログイン状態の取得
+     * @return 
+     */
     public int getStatus() {
         return this.loginStatus;
     }
 
+    /**
+     * ユーザーの認証情報を取得する。
+     * @return SamlAuthInfo
+     */
     public SamlAuthInfo getAuthInfo() {
         return this.samlAuthInfo;
     }
 
+    /**
+     * oneLoginのAuthを取得する。
+     * @return 
+     * @deprecated 完全にラップするので非推奨とした。
+     */
+    @Deprecated
     public Auth getAuth() {
         return this.auth;
     }
