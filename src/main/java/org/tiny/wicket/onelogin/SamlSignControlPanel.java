@@ -15,8 +15,6 @@
  */
 package org.tiny.wicket.onelogin;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -85,9 +83,10 @@ public class SamlSignControlPanel extends Panel {
 
             session.setSamlAuthInfo(this.samlAuthInfo);
             Roles roles = session.getRoles();
+            /*
             Logger.getLogger(this.getClass().getName()).log(Level.INFO,
                     roles.toString()
-            );
+            );*/
 
             String username = this.samlAuthInfo.getAttributeString(this.userAccountKey);
             if (username.isEmpty()) {
