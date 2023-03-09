@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -189,4 +191,23 @@ public class SamlAuthInfo extends LinkedHashMap<String, ArrayList<String>> imple
     public String getAttributeString(String attrName) {
         return this.uncupsul((ArrayList<String>) this.getAttribute(attrName));
     }
+    
+    public String toJson(){
+        JSONObject json = new JSONObject();
+        json.put(SamlAuthInfo.SAML_NAMEID, this.getNameId());
+        
+        Set<String> keys = this.attributes.keySet();
+        for(String key: keys){
+            List<String> attrs = this.attributes.get(key);
+            if(attrs.size()>1){
+                JSONArray subobject = new JSONArray(attrs);
+                json.put(key, subobject);
+            }else{
+                json.put(key, attrs.get(0));
+            }
+        }
+        
+        return json.toString();
+    }
+    
 }
